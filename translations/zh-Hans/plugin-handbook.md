@@ -90,7 +90,7 @@ Babel 是 JavaScript 编译器，更确切地说是源码到源码的编译器�
 
 这个处理过程中的每一步都涉及到创建或是操作[抽象语法树](https://en.wikipedia.org/wiki/Abstract_syntax_tree)，亦称 AST。
 
-> Babel 使用一个基于 [ESTree](https://github.com/estree/estree) 并修改过的 AST，它的内核说明文档可以在[这里](https://github. com/babel/babel/blob/master/doc/ast/spec. md)找到。.
+> Babel 使用一个基于 [ESTree](https://github.com/estree/estree) 并修改过的 AST，它的内核说明文档可以在[这里](https://github.com/babel/babel/blob/master/packages/babel-parser/ast/spec.md)找到。.
 
 ```js
 function square(n) {
@@ -229,7 +229,7 @@ Babel 的三个主要处理步骤分别是： **解析（parse）**，**转换�
 
 ### <a id="toc-parse"></a>解析
 
-**解析**步骤接收代码并输出 AST。 这个步骤分为两个阶段：[**词法分析（Lexical Analysis） **](https://en.wikipedia.org/wiki/Lexical_analysis)和 [**语法分析（Syntactic Analysis）**](https://en.wikipedia.org/wiki/Parsing)。.
+**解析**步骤接收代码并输出 AST。 这个步骤分为两个阶段：[**词法分析（Lexical Analysis）**](https://en.wikipedia.org/wiki/Lexical_analysis)和 [**语法分析（Syntactic Analysis）**](https://en.wikipedia.org/wiki/Parsing)。.
 
 #### <a id="toc-lexical-analysis"></a>词法分析
 
@@ -1311,9 +1311,9 @@ path.getStatementParent();
   * 使用 `path.container`获取路径的容器（包含所有同级节点的数组）
   * 使用 `path.listKey`获取容器的key
 
-> 这些API用于 babel-minify </>中使用的 transform-merge-sibling-variables </>插件.</p> </blockquote> 
-> 
-> ```js
+> 这些API在 [babel-minify](https://github.com/babel/minify) 的插件 [transform-merge-sibling-variables](https://github.com/babel/minify/blob/master/packages/babel-plugin-transform-merge-sibling-variables/src/index.js) 中被使用
+
+```js
 var a = 1; // pathA, path.key = 0
 var b = 2; // pathB, path.key = 1
 var c = 3; // pathC, path.key = 2
@@ -1403,11 +1403,11 @@ ReturnStatement(path) {
   }
 ```
 
-> **注意：</>当用多个节点替换一个表达式时，它们必须是   声明。 这是因为Babel在更换节点时广泛使用启发式算法，这意味着您可以做一些非常疯狂的转换，否则将会非常冗长。</p> </blockquote> 
-> 
-> ### <a id="toc-replacing-a-node-with-a-source-string"></a>用字符串源码替换节点
-> 
-> ```js
+> **注意：** 当用多个节点替换一个表达式时，它们必须是   声明。 这是因为Babel在更换节点时广泛使用启发式算法，这意味着您可以做一些非常疯狂的转换，否则将会非常冗长。</p> </blockquote> 
+
+### <a id="toc-replacing-a-node-with-a-source-string"></a>用字符串源码替换节点
+
+```js
 FunctionDeclaration(path) {
   path.replaceWithSourceString(`function add(a, b) {
     return a + b;
@@ -1423,11 +1423,11 @@ FunctionDeclaration(path) {
   }
 ```
 
-> **注意：</>不建议使用这个API，除非您正在处理动态的源码字符串，否则在访问者外部解析代码更有效率。</p> </blockquote> 
-> 
-> ### <a id="toc-inserting-a-sibling-node"></a>插入兄弟节点
-> 
-> ```js
+> **注意：** 不建议使用这个API，除非您正在处理动态的源码字符串，否则在访问者外部解析代码更有效率。</p> </blockquote> 
+
+### <a id="toc-inserting-a-sibling-node"></a>插入兄弟节点
+
+```js
 FunctionDeclaration(path) {
   path.insertBefore(t.expressionStatement(t.stringLiteral("Because I'm easy come, easy go.")));
   path.insertAfter(t.expressionStatement(t.stringLiteral("A little high, little low.")));
@@ -1442,14 +1442,13 @@ FunctionDeclaration(path) {
 + "A little high, little low.";
 ```
 
-> 注意：</>这里同样应该使用声明或者一个声明数组。 这个使用了在用多个节点替换一个节点</>中提到的相同的启发式算法。.</p> </blockquote> 
-> 
-> ### <a id="toc-inserting-into-a-container"></a>插入到容器（container）中
-> 
-> 如果您想要在AST节点属性中插入一个像` body </ 0>那样的数组。
-它与 <code> insertBefore `/` insertAfter ` 类似, 但您必须指定 ` listKey ` (通常是 ` 正文 `).
-> 
-> ```js
+> **注意：** 这里同样应该使用声明或者一个声明数组。 这个使用了[在用多个节点替换一个节点](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/en/plugin-handbook.md#replacing-a-node-with-multiple-nodes)中提到的相同的启发式算法。
+
+### <a id="toc-inserting-into-a-container"></a>插入到容器（container）中
+
+如果您想要在AST节点属性中插入一个像` body` 那样的数组。它与 `insertBefore` / `insertAfter` 类似, 但您必须指定 `listKey` (通常是 ` body `).
+
+```js
 ClassMethod(path) {
   path.get('body').unshiftContainer('body', t.expressionStatement(t.stringLiteral('before')));
   path.get('body').pushContainer('body', t.expressionStatement(t.stringLiteral('after')));
@@ -1482,14 +1481,15 @@ FunctionDeclaration(path) {
 
 ### <a id="toc-replacing-a-parent"></a>替换父节点
 
-只需使用parentPath：` path.parentPath </>调用<code> replaceWith </>即可</p>
+只需使用 parentPath：`path.parentPath`调用 `replaceWith` 即可
 
-<pre><code class="js">BinaryExpression(path) {
+```js
+BinaryExpression(path) {
   path.parentPath.replaceWith(
     t.expressionStatement(t.stringLiteral("Anyway the wind blows, doesn't really matter to me, to me."))
   );
 }
-`</pre> 
+```
 
 ```diff
   function square(n) {
@@ -1526,7 +1526,7 @@ FunctionDeclaration(path) {
 
 这将遍历范围树并检查特定的绑定。
 
-您也可以检查一个作用域是否有**自己的</>绑定：</p> 
+您也可以检查一个作用域是否有**自己的**绑定：</p> 
 
 ```js
 FunctionDeclaration(path) {
@@ -1551,14 +1551,15 @@ FunctionDeclaration(path) {
 
 ### <a id="toc-pushing-a-variable-declaration-to-a-parent-scope"></a>提升变量声明至父级作用域
 
-有时你可能想要推送一个` VariableDeclaration </>，这样你就可以分配给它。</p>
+有时你可能想要推送一个`VariableDeclaration`，这样你就可以分配给它。</p>
 
-<pre><code class="js">FunctionDeclaration(path) {
+```js
+FunctionDeclaration(path) {
   const id = path.scope.generateUidIdentifierBasedOnNode(path.node.id);
   path.remove();
   path.scope.parent.push({ id, init: path.node });
 }
-`</pre> 
+```
 
 ```diff
 - function square(n) {
@@ -1617,9 +1618,10 @@ FunctionDeclaration(path) {
 }
 ```
 
-这些选项会通过`状态</>对象传递给插件访问者：</p>
+这些选项会通过`state`对象传递给插件访问者：
 
-<pre><code class="js">export default function({ types: t }) {
+```js
+export default function({ types: t }) {
   return {
     visitor: {
       FunctionDeclaration(path, state) {
@@ -1629,7 +1631,7 @@ FunctionDeclaration(path) {
     }
   }
 }
-`</pre> 
+```
 
 这些选项是特定于插件的，您不能访问其他插件中的选项。
 
@@ -1707,7 +1709,8 @@ export default function({ types: t }) {
 
 <p>节点定义如下所示：</p>
 
-<pre><code class="js">defineType("MemberExpression", {
+```js
+defineType("MemberExpression", {
   builder: ["object", "property", "computed"],
   visitor: ["object", "property"],
   aliases: ["Expression", "LVal"],
@@ -1726,7 +1729,7 @@ export default function({ types: t }) {
     }
   }
 });
-`</pre> 
+```
 
 在这里你可以看到关于这个特定节点类型的所有信息，包括如何构建它，遍历它，并验证它。
 
@@ -1739,7 +1742,8 @@ export default function({ types: t }) {
 > 请注意，有时在节点上可以定制的属性比``构建器</>数组包含的属性更多。 这是为了防止生成器有太多的参数。 在这些情况下，您需要手动设置属性。 一个例子是<class> ClassMethod </>.</p>
 </blockquote>
 
-<pre><code class="js">// Example
+```js
+// Example
 // because the builder doesn't contain `async` as a property
 var node = t.classMethod(
   "constructor",
@@ -1749,11 +1753,11 @@ var node = t.classMethod(
 )
 // set it manually after creation
 node.async = true;
-``</pre> 
-> 
+```
+
 > You can see the validation for the builder arguments with the `fields` object.
-> 
-> ```js
+
+```js
 fields: {
   object: {
     validate: assertNodeType("Expression")
@@ -2010,7 +2014,8 @@ const MyVisitor = {
 
 我们忽略了类可以嵌套的事实，使用遍历的话，上面我们也会得到一个嵌套的`构造函数</>：</p>
 
-<pre><code class="js">class Foo {
+```js
+class Foo {
   constructor() {
     class Bar {
       constructor() {
@@ -2019,7 +2024,7 @@ const MyVisitor = {
     }
   }
 }
-`</pre> 
+```
 
 ## <a id="toc-unit-testing"></a>单元测试
 
@@ -2046,7 +2051,8 @@ const MyVisitor = {
 接下来，用`` npm install --save-dev babel-core jest </>安装我们的依赖关系，
 那么我们可以开始写我们的第一个测试：快照。 快照测试允许我们直观地检查我们的babel插件的输出。 我们给它一个输入，告诉它一个快照，并将其保存到一个文件。 我们检查快照到git中。 这允许我们来看看我们什么时候影响了我们任何试用例子测试的输出。 它也给出了使用差异在拉请求的时候。 当然，您可以用任何测试框架来做到这一点，但是要更新一下快照就像<code>jest -u </>一样简单.</p>
 
-<pre><code class="js">// src/__tests__/index-test.js
+```js
+// src/__tests__/index-test.js
 const babel = require('babel-core');
 const plugin = require('../');
 
@@ -2059,16 +2065,17 @@ it('works', () => {
   const {code} = babel.transform(example, {plugins: [plugin]});
   expect(code).toMatchSnapshot();
 });
-``</pre> 
+```
 
 这给了我们一个快照文件在`` src / __ tests __ / __ snapshots __ / index-test.js.snap </>.</p>
 
-<pre><code class="js">exports[`test works 1`] = `
+```js
+exports[`test works 1`] = `
 "
 var bar = 1;
 if (bar) console.log(bar);"
 `;
-``</pre> 
+```
 
 如果我们在插件中将“bar”更改为“baz”并再次运行，则可以得到以下结果：
 
@@ -2092,20 +2099,22 @@ if (bar) console.log(bar);"
 
 <p>除了快照测试外，我们还可以手动检查AST。 这是一个简单但是脆弱的例子。 对于更多涉及的情况，您可能希望利用Babel-遍历。 它允许您用<code>访问者</>键指定一个对象，就像您使用插件本身。</p>
 
-<pre><code class="js">it('contains baz', () => {
+```js
+it('contains baz', () => {
   const {ast} = babel.transform(example, {plugins: [plugin]});
   const program = ast.program;
   const declaration = program.body[0].declarations[0];
   assert.equal(declaration.id.name, 'baz');
   // or babelTraverse(program, {visitor: ...})
 });
-`</pre> 
+```
 
 ### Exec Tests
 
 在这里，我们将转换代码，然后评估它的行为是否正确。 请注意，我们在测试中没有使用``assert</>。 这确保如果我们的插件做了奇怪的操作，如意外删除断言线，但测试仍然失败。</p>
 
-<pre><code class="js">it('foo is an alias to baz', () => {
+```js
+it('foo is an alias to baz', () => {
   var input = `
     var foo = 1;
     // test that foo was renamed to baz
@@ -2119,7 +2128,7 @@ if (bar) console.log(bar);"
   var res = f();
   assert(res === 1, 'res is 1');
 });
-``</pre> 
+```
 
 Babel核心使用类似的方法</>去获取快照和执行测试。</p> 
 
